@@ -20,5 +20,20 @@ namespace Library.API.Controllers
         {
             return AuthorRepository.GetAuthors().ToList();
         }
+
+        [HttpGet("{authorId}")]
+        public ActionResult<AuthorDto> GetAuthor(Guid authorId)
+        {
+            var author = AuthorRepository.GetAuthor(authorId);
+
+            if (author == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return author;
+            }
+        }
     }
 }
