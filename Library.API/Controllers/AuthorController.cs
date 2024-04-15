@@ -1,4 +1,5 @@
-﻿using Library.API.Services;
+﻿using Library.API.Models;
+using Library.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.API.Controllers
@@ -13,5 +14,11 @@ namespace Library.API.Controllers
         }
 
         public IAuthorRepository AuthorRepository { get; }
+
+        [HttpGet()]
+        public ActionResult<List<AuthorDto>> GetAuthors()
+        {
+            return AuthorRepository.GetAuthors().ToList();
+        }
     }
 }
