@@ -14,5 +14,10 @@ namespace Library.API.Services
         {
             return LibraryMockData.Current.Books.Where(b => b.AuthorId == authorId).ToList();
         }
+
+        public void AddBook(BookDto book)
+        {
+            LibraryMockData.Current.Books.Add(book);
+        }
     }
 }

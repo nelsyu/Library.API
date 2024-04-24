@@ -28,7 +28,7 @@ namespace Library.API.Controllers
             return BookRepository.GetBooksForAuthor(authorId).ToList();
         }
 
-        [HttpGet("{bookId}")]
+        [HttpGet("{bookId}", Name = nameof(GetBook))]
         public ActionResult<BookDto> GetBook(Guid authorId, Guid bookId)
         {
             if (!AuthorRepository.IsAuthorExists(authorId))
@@ -43,6 +43,27 @@ namespace Library.API.Controllers
             }
 
             return targetBook;
+        }
+
+        [HttpPost]
+        public IActionResult AddBook(Guid authorId, BookForCreationDto bookForCreationDto)
+        {
+            if (!AuthorRepository.IsAuthorExists(authorId))
+            {
+                return NotFound();
+            }
+
+            var newBook = new BookDto
+            {
+                Id = Guid.NewGuid(),
+                Title = bookForCreationDto.Title,
+                Description = bookForCreationDto.Description,
+                Pages = bookForCreationDto.Pages,
+                AuthorId = authorId
+            };
+
+            BookRepository.AddBook(newBook);
+            return CreatedAtRoute(nameof(GetBook), new { authorId = authorId, bookId = newBook.Id }, newBook);
         }
     }
 }
