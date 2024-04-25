@@ -19,5 +19,10 @@ namespace Library.API.Services
         {
             LibraryMockData.Current.Books.Add(book);
         }
+
+        public void DeleteBook(BookDto book)
+        {
+            LibraryMockData.Current.Books.Remove(book);
+        }
     }
 }
