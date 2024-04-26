@@ -8,5 +8,6 @@ namespace Library.API.Services
         BookDto? GetBookForAuthor(Guid authorId, Guid bookId);
         void AddBook(BookDto book);
         void DeleteBook(BookDto book);
+        void UpdateBook(Guid authorId, Guid bookId, BookForUpdateDto book);
     }
 }
