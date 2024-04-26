@@ -1,5 +1,6 @@
 ﻿using Library.API.Models;
 using Library.API.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.API.Controllers
@@ -99,6 +100,37 @@ namespace Library.API.Controllers
             }
 
             BookRepository.UpdateBook(authorId, bookId, updateBook);
+            return NoContent();
+        }
+
+        [HttpPatch("{bookId}")]
+        public IActionResult PartiallyUpdateBook(Guid authorId, Guid bookId, JsonPatchDocument<BookForUpdateDto> patchDocument)
+        {
+            if (!AuthorRepository.IsAuthorExists(authorId))
+            {
+                return NotFound();
+            }
+
+            var book = BookRepository.GetBookForAuthor(authorId, bookId);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            var bookToPatch = new BookForUpdateDto
+            {
+                Title = book.Title,
+                Description = book.Description,
+                Pages = book.Pages
+            };
+
+            patchDocument.ApplyTo(bookToPatch, ModelState);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            BookRepository.UpdateBook(authorId, bookId, bookToPatch);
             return NoContent();
         }
     }
