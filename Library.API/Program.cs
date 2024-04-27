@@ -1,4 +1,6 @@
+using Library.API.Entities;
 using Library.API.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAuthorRepository, AuthorMockRepository>();
 builder.Services.AddScoped<IBookRepository, BookMockRepository>();
+
+builder.Services.AddDbContext<LibraryDbContext>(config =>
+{
+    config.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 var app = builder.Build();
 
