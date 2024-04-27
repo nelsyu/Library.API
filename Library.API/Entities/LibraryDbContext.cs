@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Library.API.Extentions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Library.API.Entities
 {
@@ -10,5 +11,11 @@ namespace Library.API.Entities
 
         public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            //modelBuilder.SeedData();
+        }
     }
 }
