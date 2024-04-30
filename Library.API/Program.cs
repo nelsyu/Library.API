@@ -1,4 +1,5 @@
 using Library.API.Entities;
+using Library.API.Helpers;
 using Library.API.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<LibraryDbContext>(config =>
 {
     config.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddAutoMapper(typeof(LibraryMappingProfile));
 
 var app = builder.Build();
 
