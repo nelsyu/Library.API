@@ -16,8 +16,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IAuthorRepository, AuthorMockRepository>();
-builder.Services.AddScoped<IBookRepository, BookMockRepository>();
+builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 
 builder.Services.AddDbContext<LibraryDbContext>(config =>
 {
