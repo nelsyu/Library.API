@@ -15,7 +15,8 @@ namespace Library.API.Helpers
             CreateMap<AuthorForCreationDto, Author>();
             CreateMap<Book, BookDto>();
             CreateMap<BookForCreationDto, Book>();
-            CreateMap<BookForUpdateDto, Book>();
+            CreateMap<BookForUpdateDto, Book>()
+                .ReverseMap();
         }
     }
 }

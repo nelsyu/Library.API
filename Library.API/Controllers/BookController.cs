@@ -1,4 +1,7 @@
-﻿using Library.API.Models;
+﻿using AutoMapper;
+using Library.API.Entities;
+using Library.API.Filters;
+using Library.API.Models;
 using Library.API.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -7,130 +10,115 @@ namespace Library.API.Controllers
 {
     [Route("api/authors/{authorId}/books")]
     [ApiController]
+    [ServiceFilter(typeof(CheckAuthorExistFilterAttribute))]
     public class BookController : ControllerBase
     {
-        public IAuthorRepository AuthorRepository { get; }
-        public IBookRepository BookRepository { get; }
+        public IRepositoryWrapper RepositoryWrapper { get; }
+        public IMapper Mapper { get; }
 
-        public BookController(IAuthorRepository authorRepository, IBookRepository bookRepository)
+        public BookController(IRepositoryWrapper repositoryWrapper, IMapper mapper)
         {
-            AuthorRepository = authorRepository;
-            BookRepository = bookRepository;
+            RepositoryWrapper = repositoryWrapper;
+            Mapper = mapper;
         }
 
         [HttpGet]
-        public ActionResult<List<BookDto>> GetBooks(Guid authorId)
+        public async Task<ActionResult<IEnumerable<BookDto>>> GetBooksAsync(Guid authorId)
         {
-            if (!AuthorRepository.IsAuthorExists(authorId))
-            {
-                return NotFound();
-            }
+            var books = await RepositoryWrapper.Book.GetBooksAsync(authorId);
+            var bookDtoList = Mapper.Map<IEnumerable<BookDto>>(books);
 
-            return BookRepository.GetBooksForAuthor(authorId).ToList();
+            return bookDtoList.ToList();
         }
 
-        [HttpGet("{bookId}", Name = nameof(GetBook))]
-        public ActionResult<BookDto> GetBook(Guid authorId, Guid bookId)
+        [HttpGet("{bookId}", Name = nameof(GetBookAsync))]
+        public async Task<ActionResult<BookDto>> GetBookAsync(Guid authorId, Guid bookId)
         {
-            if (!AuthorRepository.IsAuthorExists(authorId))
-            {
-                return NotFound();
-            }
-
-            var targetBook = BookRepository.GetBookForAuthor(authorId, bookId);
-            if (targetBook == null)
-            {
-                return NotFound();
-            }
-
-            return targetBook;
-        }
-
-        [HttpPost]
-        public IActionResult AddBook(Guid authorId, BookForCreationDto bookForCreationDto)
-        {
-            if (!AuthorRepository.IsAuthorExists(authorId))
-            {
-                return NotFound();
-            }
-
-            var newBook = new BookDto
-            {
-                Id = Guid.NewGuid(),
-                Title = bookForCreationDto.Title,
-                Description = bookForCreationDto.Description,
-                Pages = bookForCreationDto.Pages,
-                AuthorId = authorId
-            };
-
-            BookRepository.AddBook(newBook);
-            return CreatedAtRoute(nameof(GetBook), new { authorId = authorId, bookId = newBook.Id }, newBook);
-        }
-
-        [HttpDelete("{bookId}")]
-        public IActionResult DeleteBook(Guid authorId, Guid bookId)
-        {
-            if (!AuthorRepository.IsAuthorExists(authorId))
-            {
-                return NotFound();
-            }
-
-            var book = BookRepository.GetBookForAuthor(authorId, bookId);
+            var book = await RepositoryWrapper.Book.GetBookAsync(authorId, bookId);
             if (book == null)
             {
                 return NotFound();
             }
 
-            BookRepository.DeleteBook(book);
+            var bookDto = Mapper.Map<BookDto>(book);
+
+            return bookDto;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddBookAsync(Guid authorId, BookForCreationDto bookForCreationDto)
+        {
+            var book = Mapper.Map<Book>(bookForCreationDto);
+
+            book.AuthorId = authorId;
+            RepositoryWrapper.Book.Create(book);
+            if (!await RepositoryWrapper.Book.SaveAsync())
+            {
+                throw new Exception("建立資源Book失敗");
+            }
+
+            var bookDto = Mapper.Map<BookDto>(book);
+            return CreatedAtRoute(nameof(GetBookAsync), new { authorId = bookDto.AuthorId, bookId = bookDto.Id }, bookDto);
+        }
+
+        [HttpDelete("{bookId}")]
+        public async Task<IActionResult> DeleteBookAsync(Guid authorId, Guid bookId)
+        {
+            var book = await RepositoryWrapper.Book.GetBookAsync(authorId, bookId);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            RepositoryWrapper.Book.Delete(book);
+            if (!await RepositoryWrapper.Book.SaveAsync())
+            {
+                throw new Exception("刪除資源Book失敗");
+            }
             return NoContent();
         }
 
         [HttpPut("{bookId}")]
-        public IActionResult UpdateBook(Guid authorId, Guid bookId, BookForUpdateDto updateBook)
+        public async Task<IActionResult> UpdateBookAsync(Guid authorId, Guid bookId, BookForUpdateDto updatedBook)
         {
-            if (!AuthorRepository.IsAuthorExists(authorId))
-            {
-                return NotFound();
-            }
-
-            var book = BookRepository.GetBookForAuthor(authorId, bookId);
+            var book = await RepositoryWrapper.Book.GetBookAsync(authorId, bookId);
             if (book == null)
             {
                 return NotFound();
             }
 
-            BookRepository.UpdateBook(authorId, bookId, updateBook);
+            Mapper.Map(updatedBook, book, typeof(BookForUpdateDto), typeof(Book));
+            RepositoryWrapper.Book.Update(book);
+            if (!await RepositoryWrapper.Book.SaveAsync())
+            {
+                throw new Exception("更新資源Book失敗");
+            }
             return NoContent();
         }
 
         [HttpPatch("{bookId}")]
-        public IActionResult PartiallyUpdateBook(Guid authorId, Guid bookId, JsonPatchDocument<BookForUpdateDto> patchDocument)
+        public async Task<IActionResult> ParticallyUpdateBookAsync(Guid authorId, Guid bookId, JsonPatchDocument<BookForUpdateDto> patchDocument)
         {
-            if (!AuthorRepository.IsAuthorExists(authorId))
-            {
-                return NotFound();
-            }
-
-            var book = BookRepository.GetBookForAuthor(authorId, bookId);
+            var book = await RepositoryWrapper.Book.GetBookAsync(authorId, bookId);
             if (book == null)
             {
                 return NotFound();
             }
 
-            var bookToPatch = new BookForUpdateDto
-            {
-                Title = book.Title,
-                Description = book.Description,
-                Pages = book.Pages
-            };
-
-            patchDocument.ApplyTo(bookToPatch, ModelState);
+            var bookUpdateDto = Mapper.Map<BookForUpdateDto>(book);
+            patchDocument.ApplyTo(bookUpdateDto);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            BookRepository.UpdateBook(authorId, bookId, bookToPatch);
+            Mapper.Map(bookUpdateDto, book, typeof(BookForUpdateDto), typeof(Book));
+
+            RepositoryWrapper.Book.Update(book);
+            if (!await RepositoryWrapper.Book.SaveAsync())
+            {
+                throw new Exception("更新資源Book失敗");
+            }
             return NoContent();
         }
     }

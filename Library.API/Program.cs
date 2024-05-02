@@ -1,4 +1,5 @@
 using Library.API.Entities;
+using Library.API.Filters;
 using Library.API.Helpers;
 using Library.API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+builder.Services.AddScoped<CheckAuthorExistFilterAttribute>();
 
 builder.Services.AddDbContext<LibraryDbContext>(config =>
 {
