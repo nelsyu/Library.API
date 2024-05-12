@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Library.API.Entities;
+using Library.API.Helpers;
 using Library.API.Models;
 using Library.API.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +21,11 @@ namespace Library.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<AuthorDto>>> GetAuthorsAsync()
+        public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthorsAsync([FromQuery]AuthorResourceParameters parameters)
         {
-            var authors = (await RepositoryWrapper.Author.GetAllAsync()).OrderBy(author => author.Name);
+            var authors = (await RepositoryWrapper.Author.GetAllAsync())
+                .Skip(parameters.PageSize * (parameters.PageNumber - 1))
+                .Take(parameters.PageSize);
             var authorDtoList = Mapper.Map<IEnumerable<AuthorDto>>(authors);
 
             return authorDtoList.ToList();
