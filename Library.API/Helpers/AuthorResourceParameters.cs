@@ -14,5 +14,7 @@
                 _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
             }
         }
+
+        public string? BirthPlace { get; set; }
     }
 }
