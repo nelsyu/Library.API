@@ -1,7 +1,7 @@
 ﻿using Library.API.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Library.API.Extentions
+namespace Library.API.Extensions
 {
     public static class ModelBuilderExtension
     {

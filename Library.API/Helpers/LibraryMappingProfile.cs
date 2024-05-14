@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Library.API.Entities;
-using Library.API.Extentions;
+using Library.API.Extensions;
 using Library.API.Models;
 
 namespace Library.API.Helpers
