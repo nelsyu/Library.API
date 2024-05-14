@@ -16,5 +16,6 @@
         }
 
         public string? BirthPlace { get; set; }
+        public string? SearchQuery { get; set; }
     }
 }

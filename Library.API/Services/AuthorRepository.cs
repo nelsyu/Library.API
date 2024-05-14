@@ -18,6 +18,13 @@ namespace Library.API.Services
                 queryableAuthors = queryableAuthors.Where(m => m.BirthPlace!.ToLower() == parameters.BirthPlace);
             }
 
+            if (!string.IsNullOrWhiteSpace(parameters.SearchQuery))
+            {
+                queryableAuthors = queryableAuthors.Where(
+                    m => m.BirthPlace!.ToLower().Contains(parameters.SearchQuery.ToLower())
+                    || m.Name!.ToLower().Contains(parameters.SearchQuery.ToLower()));
+            }
+
             return PagedList<Author>.CreateAsync(queryableAuthors, parameters.PageNumber, parameters.PageSize);
         }
     }
