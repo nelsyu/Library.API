@@ -36,14 +36,16 @@ namespace Library.API.Controllers
                     pageNumber = pagedList.CurrentPage - 1,
                     pageSize = pagedList.PageSize,
                     birthPlace = parameters.BirthPlace,
-                    searchQuery = parameters.SearchQuery
+                    searchQuery = parameters.SearchQuery,
+                    sortBy = parameters.SortBy
                 }) : null,
                 nextPageLink = pagedList.HasNext ? Url.Link(nameof(GetAuthorsAsync), new
                 {
                     pageNumber = pagedList.CurrentPage + 1,
                     pageSize = pagedList.PageSize,
                     birthPlace = parameters.BirthPlace,
-                    searchQuery = parameters.SearchQuery
+                    searchQuery = parameters.SearchQuery,
+                    sortBy = parameters.SortBy
                 }) : null
             };
 

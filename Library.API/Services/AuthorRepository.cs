@@ -1,6 +1,7 @@
 ﻿using Library.API.Entities;
 using Library.API.Helpers;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace Library.API.Services
 {
@@ -25,7 +26,8 @@ namespace Library.API.Services
                     || m.Name!.ToLower().Contains(parameters.SearchQuery.ToLower()));
             }
 
-            return PagedList<Author>.CreateAsync(queryableAuthors, parameters.PageNumber, parameters.PageSize);
+            var orderedAuthors = queryableAuthors.OrderBy(parameters.SortBy);
+            return PagedList<Author>.CreateAsync(orderedAuthors, parameters.PageNumber, parameters.PageSize);
         }
     }
 }
