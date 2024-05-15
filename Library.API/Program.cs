@@ -3,6 +3,7 @@ using Library.API.Filters;
 using Library.API.Helpers;
 using Library.API.Services;
 using Microsoft.EntityFrameworkCore;
+using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,9 @@ builder.Services.AddDbContext<LibraryDbContext>(config =>
 });
 
 builder.Services.AddAutoMapper(typeof(LibraryMappingProfile));
+
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
 
 var app = builder.Build();
 

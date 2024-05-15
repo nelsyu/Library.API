@@ -14,11 +14,13 @@ namespace Library.API.Controllers
     {
         public IRepositoryWrapper RepositoryWrapper { get; }
         public IMapper Mapper { get; }
+        public ILogger<AuthorController> Logger { get; }
 
-        public AuthorController(IRepositoryWrapper repositoryWrapper, IMapper mapper)
+        public AuthorController(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILogger<AuthorController> logger)
         {
             RepositoryWrapper = repositoryWrapper;
             Mapper = mapper;
+            Logger = logger;
         }
 
         [HttpGet(Name = nameof(GetAuthorsAsync))]
