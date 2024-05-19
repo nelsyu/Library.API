@@ -4,6 +4,7 @@ using Library.API.Helpers;
 using Library.API.Models;
 using Library.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 
 namespace Library.API.Controllers
@@ -59,12 +60,20 @@ namespace Library.API.Controllers
         }
 
         [HttpGet("{authorId}", Name = nameof(GetAuthorAsync))]
+        [ResponseCache(Duration = 60)]
         public async Task<ActionResult<AuthorDto>> GetAuthorAsync(Guid authorId)
         {
             var author = await RepositoryWrapper.Author.GetByIdAsync(authorId);
             if (author == null)
             {
                 return NotFound();
+            }
+
+            var entityHash = HashFactory.GetHash(author);
+            Response.Headers[HeaderNames.ETag] = entityHash;
+            if (Request.Headers.TryGetValue(HeaderNames.IfNoneMatch, out var requestETag) && entityHash == requestETag)
+            {
+                return StatusCode(StatusCodes.Status304NotModified);
             }
 
             var authorDto = Mapper.Map<AuthorDto>(author);

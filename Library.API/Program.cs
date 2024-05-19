@@ -2,6 +2,7 @@ using Library.API.Entities;
 using Library.API.Filters;
 using Library.API.Helpers;
 using Library.API.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NLog.Web;
 
@@ -18,6 +19,19 @@ builder.Services.AddControllers(options =>
     .AddMvcOptions(config =>
     {
         config.Filters.Add<JsonExceptionFilter>();
+
+        config.CacheProfiles.Add("Default",
+            new CacheProfile()
+            {
+                Duration = 60
+            });
+
+        config.CacheProfiles.Add("Never",
+            new CacheProfile()
+            {
+                Location = ResponseCacheLocation.None,
+                NoStore = true
+            });
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
