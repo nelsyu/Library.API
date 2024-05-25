@@ -47,6 +47,12 @@ builder.Services.AddDbContext<LibraryDbContext>(config =>
 
 builder.Services.AddAutoMapper(typeof(LibraryMappingProfile));
 
+builder.Services.AddResponseCaching(options =>
+{
+    options.UseCaseSensitivePaths = true;
+    options.MaximumBodySize = 1024;
+});
+
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
@@ -62,6 +68,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseResponseCaching();
 
 app.MapControllers();
 
