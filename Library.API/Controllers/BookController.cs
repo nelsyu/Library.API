@@ -5,6 +5,7 @@ using Library.API.Models;
 using Library.API.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Library.API.Controllers
 {
@@ -15,20 +16,31 @@ namespace Library.API.Controllers
     {
         public IRepositoryWrapper RepositoryWrapper { get; }
         public IMapper Mapper { get; }
+        public IMemoryCache MemoryCache { get; }
 
-        public BookController(IRepositoryWrapper repositoryWrapper, IMapper mapper)
+        public BookController(IRepositoryWrapper repositoryWrapper, IMapper mapper, IMemoryCache memoryCache)
         {
             RepositoryWrapper = repositoryWrapper;
             Mapper = mapper;
+            MemoryCache = memoryCache;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BookDto>>> GetBooksAsync(Guid authorId)
+        public async Task<ActionResult<IEnumerable<BookDto>?>> GetBooksAsync(Guid authorId)
         {
-            var books = await RepositoryWrapper.Book.GetBooksAsync(authorId);
-            var bookDtoList = Mapper.Map<IEnumerable<BookDto>>(books);
+            List<BookDto>? bookDtoList = new List<BookDto>();
+            string key = $"{authorId}_books";
+            if (!MemoryCache.TryGetValue(key, out bookDtoList))
+            {
+                var books = await RepositoryWrapper.Book.GetBooksAsync(authorId);
+                bookDtoList = Mapper.Map<IEnumerable<BookDto>>(books).ToList();
+                MemoryCacheEntryOptions options = new MemoryCacheEntryOptions();
+                options.AbsoluteExpiration = DateTime.Now.AddMinutes(10);
+                options.Priority = CacheItemPriority.Normal;
+                MemoryCache.Set(key, bookDtoList, options);
+            }
 
-            return bookDtoList.ToList();
+            return bookDtoList;
         }
 
         [HttpGet("{bookId}", Name = nameof(GetBookAsync))]

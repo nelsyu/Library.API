@@ -53,6 +53,8 @@ builder.Services.AddResponseCaching(options =>
     options.MaximumBodySize = 1024;
 });
 
+builder.Services.AddMemoryCache();
+
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
