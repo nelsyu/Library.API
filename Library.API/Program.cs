@@ -55,6 +55,12 @@ builder.Services.AddResponseCaching(options =>
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Caching:Host"];
+    options.InstanceName = builder.Configuration["Caching:Instance"];
+});
+
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
