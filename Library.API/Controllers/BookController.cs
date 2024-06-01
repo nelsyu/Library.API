@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Library.API.Entities;
 using Library.API.Filters;
+using Library.API.Helpers;
 using Library.API.Models;
 using Library.API.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Net.Http.Headers;
 
 namespace Library.API.Controllers
 {
@@ -91,6 +93,7 @@ namespace Library.API.Controllers
         }
 
         [HttpPut("{bookId}")]
+        [CheckIfMatchHeaderFilter]
         public async Task<IActionResult> UpdateBookAsync(Guid authorId, Guid bookId, BookForUpdateDto updatedBook)
         {
             var book = await RepositoryWrapper.Book.GetBookAsync(authorId, bookId);
@@ -99,12 +102,23 @@ namespace Library.API.Controllers
                 return NotFound();
             }
 
+            var entityHash = HashFactory.GetHash(book);
+            if (Request.Headers.TryGetValue(HeaderNames.IfMatch, out var requestETag)
+                && requestETag != entityHash)
+            {
+                return StatusCode(StatusCodes.Status412PreconditionFailed);
+            }
+
             Mapper.Map(updatedBook, book, typeof(BookForUpdateDto), typeof(Book));
             RepositoryWrapper.Book.Update(book);
             if (!await RepositoryWrapper.Book.SaveAsync())
             {
                 throw new Exception("更新資源Book失敗");
             }
+
+            var entityNewHash = HashFactory.GetHash(book);
+            Response.Headers[HeaderNames.ETag] = entityNewHash;
+
             return NoContent();
         }
 
