@@ -27,7 +27,7 @@ namespace Library.API.Controllers
             MemoryCache = memoryCache;
         }
 
-        [HttpGet]
+        [HttpGet(Name = nameof(GetBooksAsync))]
         public async Task<ActionResult<IEnumerable<BookDto>?>> GetBooksAsync(Guid authorId)
         {
             List<BookDto>? bookDtoList = new List<BookDto>();
