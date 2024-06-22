@@ -1,9 +1,13 @@
 using Asp.Versioning;
+using GraphQL;
+using GraphQL.Types;
 using Library.API.Entities;
+using Library.API.Extensions;
 using Library.API.Filters;
 using Library.API.Helpers;
 using Library.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
@@ -90,6 +94,13 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v2", new OpenApiInfo { Title = "Library.API", Version = "v2" });
 });
 
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.AllowSynchronousIO = true;
+});
+
+builder.Services.AddGraphQLSchemaAndTypes();
+
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
@@ -113,5 +124,9 @@ app.UseAuthorization();
 app.UseResponseCaching();
 
 app.MapControllers();
+
+app.UseGraphQL<ISchema>();
+
+app.UseGraphQLPlayground("/ui/playground");
 
 app.Run();
