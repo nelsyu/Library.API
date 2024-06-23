@@ -6,11 +6,14 @@ using Library.API.Extensions;
 using Library.API.Filters;
 using Library.API.Helpers;
 using Library.API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +103,28 @@ builder.Services.Configure<KestrelServerOptions>(options =>
 });
 
 builder.Services.AddGraphQLSchemaAndTypes();
+
+var tokenSection = builder.Configuration.GetSection("Security:Token");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuer = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = tokenSection["Issuer"],
+        ValidAudience = tokenSection["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSection["Key"]!)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();

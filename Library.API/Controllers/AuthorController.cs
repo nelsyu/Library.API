@@ -3,6 +3,7 @@ using Library.API.Entities;
 using Library.API.Helpers;
 using Library.API.Models;
 using Library.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Net.Http.Headers;
@@ -12,6 +13,7 @@ namespace Library.API.Controllers
 {
     [Route("api/authors")]
     [ApiController]
+    [Authorize]
     public class AuthorController : ControllerBase
     {
         public IRepositoryWrapper RepositoryWrapper { get; }
@@ -27,6 +29,7 @@ namespace Library.API.Controllers
             DistributedCache = distributedCache;
         }
 
+        [AllowAnonymous]
         [HttpGet(Name = nameof(GetAuthorsAsync))]
         public async Task<ActionResult<ResourceCollection<AuthorDto>>> GetAuthorsAsync([FromQuery]AuthorResourceParameters parameters)
         {
