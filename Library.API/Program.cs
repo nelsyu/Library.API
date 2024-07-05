@@ -106,6 +106,9 @@ builder.Services.AddGraphQLSchemaAndTypes();
 
 var tokenSection = builder.Configuration.GetSection("Security:Token");
 
+builder.Services.AddIdentity<User, Role>()
+    .AddEntityFrameworkStores<LibraryDbContext>();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
