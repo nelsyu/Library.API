@@ -129,6 +129,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddHsts(option =>
+{
+    option.MaxAge = TimeSpan.FromDays(5);
+    option.Preload = true;
+    option.IncludeSubDomains = true;
+    option.ExcludedHosts.Clear();
+});
+
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
@@ -143,6 +151,10 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"Library.API v1");
         c.SwaggerEndpoint($"/swagger/v2/swagger.json", $"Library.API v2");
     });
+}
+else
+{
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
