@@ -137,6 +137,8 @@ builder.Services.AddHsts(option =>
     option.ExcludedHosts.Clear();
 });
 
+builder.Services.AddDataProtection();
+
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
