@@ -7,6 +7,9 @@ using Library.API.Filters;
 using Library.API.Helpers;
 using Library.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -137,7 +140,16 @@ builder.Services.AddHsts(option =>
     option.ExcludedHosts.Clear();
 });
 
-builder.Services.AddDataProtection();
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("data_keys"))
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(30))
+    .UseCryptographicAlgorithms(
+        new AuthenticatedEncryptorConfiguration()
+        {
+            EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
+            ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
+        })
+    .SetApplicationName("shared app name");
 
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
