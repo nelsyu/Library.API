@@ -165,6 +165,8 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"Library.API v1");
         c.SwaggerEndpoint($"/swagger/v2/swagger.json", $"Library.API v2");
     });
+
+    builder.Configuration.AddUserSecrets<Program>();
 }
 else
 {
