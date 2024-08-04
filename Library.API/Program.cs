@@ -151,10 +151,19 @@ builder.Services.AddDataProtection()
         })
     .SetApplicationName("shared app name");
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllMethodsPolicy", builder => builder.WithOrigins("https://localhost:6001").AllowAnyMethod());
+    options.AddPolicy("AllowAnyOriginPolicy", builder => builder.AllowAnyOrigin());
+    options.AddDefaultPolicy(builder => builder.WithOrigins("https://localhost:6001"));
+});
+
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
 var app = builder.Build();
+
+app.UseCors();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

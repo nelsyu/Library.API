@@ -4,6 +4,7 @@ using Library.API.Helpers;
 using Library.API.Models;
 using Library.API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Net.Http.Headers;
@@ -11,6 +12,7 @@ using Newtonsoft.Json;
 
 namespace Library.API.Controllers
 {
+    [EnableCors]
     [Route("api/authors")]
     [ApiController]
     [Authorize]
@@ -137,6 +139,7 @@ namespace Library.API.Controllers
             return CreatedAtRoute(nameof(GetAuthorAsync), new { authorId = authorCreated.Id }, CreateLinksForAuthor(authorCreated));
         }
 
+        [EnableCors("AllowAllMethodsPolicy")]
         [HttpDelete("{authorId}", Name = nameof(DeleteAuthorAsync))]
         public async Task<ActionResult> DeleteAuthorAsync(Guid authorId)
         {
