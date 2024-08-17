@@ -5,6 +5,7 @@ using Library.API.Entities;
 using Library.API.Extensions;
 using Library.API.Filters;
 using Library.API.Helpers;
+using Library.API.Middlewares;
 using Library.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
@@ -158,6 +159,8 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(builder => builder.WithOrigins("https://localhost:6001"));
 });
 
+builder.Services.AddMemoryCache();
+
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
@@ -183,6 +186,8 @@ else
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<RequestRateLimitingMiddleware>();
 
 app.UseAuthorization();
 
