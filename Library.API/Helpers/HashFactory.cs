@@ -4,9 +4,14 @@ using System.Text;
 
 namespace Library.API.Helpers
 {
-    public class HashFactory
+    public interface IHashFactory
     {
-        public static string GetHash(object entity)
+        string GetHash(object entity);
+    }
+
+    public class HashFactory : IHashFactory
+    {
+        public string GetHash(object entity)
         {
             string result = string.Empty;
 

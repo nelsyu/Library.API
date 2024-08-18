@@ -52,6 +52,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddScoped<CheckAuthorExistFilterAttribute>();
+builder.Services.AddSingleton<IHashFactory, HashFactory>();
 
 builder.Services.AddDbContext<LibraryDbContext>(config =>
 {

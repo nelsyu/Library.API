@@ -21,12 +21,14 @@ namespace Library.API.Controllers
     {
         public IRepositoryWrapper RepositoryWrapper { get; }
         public IMapper Mapper { get; }
+        public IHashFactory HashFactory { get; }
         public IMemoryCache MemoryCache { get; }
 
-        public BookController(IRepositoryWrapper repositoryWrapper, IMapper mapper, IMemoryCache memoryCache)
+        public BookController(IRepositoryWrapper repositoryWrapper, IMapper mapper, IHashFactory hashFactory, IMemoryCache memoryCache)
         {
             RepositoryWrapper = repositoryWrapper;
             Mapper = mapper;
+            HashFactory = hashFactory;
             MemoryCache = memoryCache;
         }
 

@@ -21,13 +21,15 @@ namespace Library.API.Controllers
         public IRepositoryWrapper RepositoryWrapper { get; }
         public IMapper Mapper { get; }
         public ILogger<AuthorController> Logger { get; }
+        public IHashFactory HashFactory { get; }
         public IDistributedCache DistributedCache { get; }
 
-        public AuthorController(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILogger<AuthorController> logger, IDistributedCache distributedCache)
+        public AuthorController(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILogger<AuthorController> logger, IHashFactory hashFactory, IDistributedCache distributedCache)
         {
             RepositoryWrapper = repositoryWrapper;
             Mapper = mapper;
             Logger = logger;
+            HashFactory = hashFactory;
             DistributedCache = distributedCache;
         }
 
