@@ -104,6 +104,7 @@ namespace Library.API.Controllers
             return CreateLinksForAuthors(resourceList, parameters, paginationMetadata);
         }
 
+        [AllowAnonymous]
         [HttpGet("{authorId}", Name = nameof(GetAuthorAsync))]
         [ResponseCache(Duration = 60)]
         public async Task<ActionResult<AuthorDto>> GetAuthorAsync(Guid authorId)

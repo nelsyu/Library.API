@@ -201,3 +201,5 @@ app.UseGraphQL<ISchema>();
 app.UseGraphQLPlayground("/ui/playground");
 
 app.Run();
+
+public partial class Program { }
