@@ -100,6 +100,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Library.API", Version = "v1" });
     c.SwaggerDoc("v2", new OpenApiInfo { Title = "Library.API", Version = "v2" });
+
+    var xmlFile = Path.ChangeExtension(typeof(Program).Assembly.Location, ".xml");
+    c.IncludeXmlComments(xmlFile);
 });
 
 builder.Services.Configure<KestrelServerOptions>(options =>

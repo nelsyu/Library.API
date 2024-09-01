@@ -126,7 +126,28 @@ namespace Library.API.Controllers
             return CreateLinksForAuthor(authorDto);
         }
 
+        /// <summary>
+        /// 添加一個作者
+        /// </summary>
+        /// <param name="authorForCreationDto">作者</param>
+        /// <remarks>
+        /// 添加作者的請求：        
+        /// 
+        ///     POST api/authors
+        ///     {
+        ///         "name" : "Author1",
+        ///         "birthplace" : "Beijing",
+        ///         "dateOfBirth" : "1980/1/1",
+        ///         "email" : "xxx@xxx.com"
+        ///     }
+        /// </remarks>
+        /// <returns>添加結果</returns>
+        /// <response code="201">返回新創建的資源</response>
+        /// <response code="400">提交請求時的信息不正確</response>
         [HttpPost(Name = nameof(CreateAuthorAsync))]
+        //[ProducesResponseType(201, Type = typeof(AuthorDto))]
+        //[ProducesResponseType(400, Type = typeof(void))]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Create))]
         public async Task<ActionResult> CreateAuthorAsync(AuthorForCreationDto authorForCreationDto)
         {
             var author = Mapper.Map<Author>(authorForCreationDto);
