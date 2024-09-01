@@ -170,18 +170,18 @@ var app = builder.Build();
 app.UseCors();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"Library.API v1");
-        c.SwaggerEndpoint($"/swagger/v2/swagger.json", $"Library.API v2");
-    });
 
-    builder.Configuration.AddUserSecrets<Program>();
-}
-else
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.RoutePrefix = string.Empty;
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Library API v1");
+    c.SwaggerEndpoint("/swagger/v2/swagger.json", "Library API v2");
+});
+
+builder.Configuration.AddUserSecrets<Program>();
+
+if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
 }
